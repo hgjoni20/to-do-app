@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Express + SQLite To-Do App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="brand">
+        <h1>Task <span>Master</span></h1>
+        <p class="subtitle">Node.js + Express + SQLite Backend Integration</p>
+      </div>
+
+      <div class="settings-menu">
+        <button id="toggleSettingsBtn" class="icon-btn" title="Cilësimet e API">⚙️</button>
+        <div id="settingsPanel" class="settings-panel hidden">
+          <div class="settings-group">
+            <label for="apiUrl">API Base URL</label>
+
+              <input type="text" id="apiUrl" value="http://localhost:3000/api" placeholder="http://localhost:3000/api">
+            </div>
+            <div class="settings-group">
+              <label for="routePath">Route Path</label>
+              <input type="text" id="routePath" value="/tasks" placeholder="/tasks">
+            </div>
+            <button id="saveConfigBtn" class="btn primary-btn btn-sm">Ruaj Konfigurimin</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Dynamic Status & Metrics Panel -->
+      <section class="metrics-bar">
+        <div class="metric-card">
+          <span class="metric-label">Statusi i API</span>
+          <span id="apiStatusBadge" class="badge status-idle">Gati</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">Vonesa (Latency)</span>
+          <span id="latencyDisplay" class="metric-value">-- ms</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-label">HTTP Code i Fundit</span>
+          <span id="httpStatusDisplay" class="metric-value">---</span>
+        </div>
+      </section>
+
+      <!-- Alert Banner for Errors / 429 Rate Limit -->
+      <div id="alertBanner" class="alert-banner hidden"></div>
+
+      <!-- Add Task Form -->
+      <form id="todoForm" class="todo-form">
+        <div class="input-wrapper">
+          <input type="text" id="taskInput" placeholder="Shto një detyrë të re..." autocomplete="off" required maxlength="120">
+          <span id="charCounter" class="char-counter">0/120</span>
+        </div>
+        <button type="submit" id="addTaskBtn" class="btn primary-btn">
+          <span>Shto Detyrën</span>
+        </button>
+      </form>
+
+      <!-- Task Lists & Controls -->
+      <main class="content-area">
+        <div class="list-controls">
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">Të Gjitha (<span id="countAll">0</span>)</button>
+            <button class="filter-btn" data-filter="pending">Pezull (<span id="countPending">0</span>)</button>
+            <button class="filter-btn" data-filter="completed">Përfunduara (<span id="countCompleted">0</span>)</button>
+          </div>
+          <button id="refreshBtn" class="btn secondary-btn btn-sm" title="Rifresko të dhënat">🔄 Rifresko</button>
+        </div>
+
+        <ul id="taskList" class="task-list">
+          <li class="empty-state">
+            <p>Nuk ka detyra për t'u shfaqur. Shto një të re ose kontrollo lidhjen me serverin!</p>
+          </li>
+        </ul>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
