@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Elements
   const apiUrlInput = document.getElementById('apiUrl');
-  const routePathInput = document.getElementById('routePath');
   const saveConfigBtn = document.getElementById('saveConfigBtn');
   const toggleSettingsBtn = document.getElementById('toggleSettingsBtn');
   const settingsPanel = document.getElementById('settingsPanel');
@@ -22,11 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const countCompleted = document.getElementById('countCompleted');
   const filterBtns = document.querySelectorAll('.filter-btn');
 
-  // State
   let tasks = [];
   let currentFilter = 'all';
-
-  // Toggle Settings Panel
   toggleSettingsBtn.addEventListener('click', () => {
     settingsPanel.classList.toggle('hidden');
   });
@@ -36,21 +31,14 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchTasks();
   });
 
-  // Input Character Counter
   taskInput.addEventListener('input', (e) => {
     charCounter.textContent = `${e.target.value.length}/120`;
   });
-
-  // Get API Endpoint URL
-  const getEndpoint = () => {
-    const base = apiUrlInput.value.replace(/\/$/, '');
-    const path = routePathInput.value.replace(/^\//, '');
-    return `${base}/${path}`;
+  const getBaseUrl = () => {
+    return apiUrlInput.value.replace(/\/$/, '');
   };
 
-  // Status & Metrics Updater
   const updateMetrics = (status, latency, code) => {
-    // Badge status
     apiStatusBadge.className = 'badge';
     if (status === 'loading') {
       apiStatusBadge.classList.add('status-loading');
@@ -63,11 +51,9 @@ document.addEventListener('DOMContentLoaded', () => {
       apiStatusBadge.textContent = 'Gabim API';
     }
 
-    // Latency & Code
     latencyDisplay.textContent = latency ? `${latency} ms` : '-- ms';
     httpStatusDisplay.textContent = code || '---';
 
-    // Handle 429 Rate Limit Alert
     if (code === 429) {
       alertBanner.className = 'alert-banner alert-429';
       alertBanner.textContent = '⚠️ Gabim 429: Shumë kërkesa rresht! Rate limiter-i yt në backend e bllokoi këtë kërkesë.';
@@ -79,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // API Call Wrapper
   const apiCall = async (url, options = {}) => {
     const startTime = performance.now();
     updateMetrics('loading', null, null);
@@ -102,22 +87,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // Fetch Tasks (GET /api/tasks)
   const fetchTasks = async () => {
-    const res = await apiCall(getEndpoint());
+    const url = `${getBaseUrl()}/tasks/display`;
+    const res = await apiCall(url);
     if (res.ok && Array.isArray(res.data)) {
       tasks = res.data;
       renderTasks();
     }
   };
 
-  // Add Task (POST /api/tasks)
   todoForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const title = taskInput.value.trim();
     if (!title) return;
 
-    const res = await apiCall(getEndpoint(), {
+    const url = `${getBaseUrl()}/tasks/create`;
+    const res = await apiCall(url, {
       method: 'POST',
       body: JSON.stringify({ title })
     });
@@ -129,9 +114,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Toggle Task Status (PUT /api/tasks/:id)
   window.toggleTask = async (id, currentStatus) => {
-    const res = await apiCall(`${getEndpoint()}/${id}`, {
+    const url = `${getBaseUrl()}/tasks/update/${id}`;
+    const res = await apiCall(url, {
       method: 'PUT',
       body: JSON.stringify({ completed: !currentStatus })
     });
@@ -139,18 +124,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (res.ok) fetchTasks();
   };
 
-  // Delete Task (DELETE /api/tasks/:id)
   window.deleteTask = async (id) => {
-    const res = await apiCall(`${getEndpoint()}/${id}`, {
+    const url = `${getBaseUrl()}/tasks/delete/${id}`;
+    const res = await apiCall(url, {
       method: 'DELETE'
     });
 
     if (res.ok) fetchTasks();
   };
 
-  // Render Tasks to DOM
   const renderTasks = () => {
-    // Update Counts
     const completedCount = tasks.filter(t => t.completed).length;
     const pendingCount = tasks.length - completedCount;
     
@@ -158,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
     countPending.textContent = pendingCount;
     countCompleted.textContent = completedCount;
 
-    // Filter Tasks
     const filtered = tasks.filter(t => {
       if (currentFilter === 'pending') return !t.completed;
       if (currentFilter === 'completed') return t.completed;
@@ -189,7 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
     `).join('');
   };
 
-  // Filter Buttons Event Listeners
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       filterBtns.forEach(b => b.classList.remove('active'));
@@ -200,14 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   refreshBtn.addEventListener('click', fetchTasks);
-
-  // Helper function to prevent XSS
   function escapeHtml(str) {
     return str.replace(/[&<>"']/g, match => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
     }[match]));
   }
-
-  // Initial Load
   fetchTasks();
 });
