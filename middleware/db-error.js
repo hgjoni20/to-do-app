@@ -1,4 +1,5 @@
-import db from '../config/database.js';
+import sqlite3 from 'sqlite3';
+const db = new sqlite3.Database('../../db.db');
 
 export const checkDatabaseConnection = (req, res, next) => {
   db.get('SELECT 1', (err) => {
@@ -12,3 +13,4 @@ export const checkDatabaseConnection = (req, res, next) => {
     next();
   });
 };
+

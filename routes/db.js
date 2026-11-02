@@ -4,16 +4,16 @@ import sqlite3 from 'sqlite3';
 
 const db = new sqlite3.Database('../../db.db', (err) => {
   if (err) {
-    console.error('Gabim në lidhje me db.db:', err.message);
+    console.error('Gabim në lidhje me databazen', err.message);
   } else {
-    console.log('Lidhur me sukses me db.db!');
+    console.log('Lidhur me sukses me databazen!');
   }
 });
 
 const router = express.Router();
 router.use(checkDatabaseConnection);
 
-router.get("/", (req, res) => {
+router.get("/display", (req, res) => {
   const query = "SELECT * FROM tasks ORDER BY id DESC";
 
   db.all(query, [], (err, rows) => {
@@ -25,7 +25,7 @@ router.get("/", (req, res) => {
   });
 });
 
-router.post("/", (req, res) => {
+router.post("/create", (req, res) => {
   const { title } = req.body;
 
   if (!title || title.trim() === "") {
@@ -48,7 +48,7 @@ router.post("/", (req, res) => {
   });
 });
 
-router.put("/:id", (req, res) => {
+router.put("/update/:id", (req, res) => {
   const { id } = req.params;
   const { completed } = req.body;
 
@@ -68,7 +68,7 @@ router.put("/:id", (req, res) => {
   });
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/delete/:id", (req, res) => {
   const { id } = req.params;
 
   const query = "DELETE FROM tasks WHERE id = ?";
