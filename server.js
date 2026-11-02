@@ -4,6 +4,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import path from 'path';
 import { fileURLToPath } from 'url';
 import router from "./routes/db.js";
+import cors from "cors";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,6 +14,7 @@ const port = process.env.PORT;
 
 app.use(express.json());
 app.use(errorHandler);
+app.use(cors())
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use("/tasks", router);

@@ -1,12 +1,18 @@
 import express from 'express';
 import { checkDatabaseConnection } from '../middleware/db-error.js';
 import sqlite3 from 'sqlite3';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const db = new sqlite3.Database('../../db.db', (err) => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const dbPath = path.resolve(__dirname, '../db.db');
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
-    console.error('Gabim në lidhje me databazen', err.message);
+    console.error('Gabim në lidhje me databazën:', err.message);
   } else {
-    console.log('Lidhur me sukses me databazen!');
+    console.log('Lidhur me sukses me databazën!');
   }
 });
 
